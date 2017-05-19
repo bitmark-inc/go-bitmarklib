@@ -1,0 +1,1 @@
+# bitmark library for go
