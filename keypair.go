@@ -74,6 +74,28 @@ func (kp KeyPair) SeedBytes() []byte {
 	return kp.seed
 }
 
+func (kp KeyPair) KeyType() string {
+	// HARDCODE: only one algorithm type is in the system now.
+	return "ed25519"
+}
+
+func (kp KeyPair) Network() string {
+	// FIXME: it is better to use variables in bitmarkd for determine header size.
+	if len(kp.seed) < 4 {
+		return "unknown"
+	}
+
+	networkByte := kp.seed[3]
+	switch networkByte {
+	case variantLivenet:
+		return "livenet"
+	case variantTestnet:
+		return "testnet"
+	default:
+		return "unknown"
+	}
+}
+
 // NewKeyPair will first generate a seed. Then it use the seed
 // to generate a new keypair
 func NewKeyPair(test bool, algorithm KeyType) (*KeyPair, error) {

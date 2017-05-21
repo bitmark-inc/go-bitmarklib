@@ -18,6 +18,22 @@ func TestFromKIF(t *testing.T) {
 	)
 }
 
+func TestNetworkTypeTestnet(t *testing.T) {
+	seed := "5XEECseCzmTE1SeJb5tQCpDK6cyDx2qKinCg5BNFgWnn3d9FjsEVDHZ"
+
+	kp, err := NewKeyPairFromBase58Seed(seed)
+	assert.NoError(t, err)
+	assert.Equal(t, "testnet", kp.Network())
+}
+
+func TestNetworkTypeLivenet(t *testing.T) {
+	seed := "5XEECqgoxCaQyGgJBMtW2WP57bnu4eVUUveNN56RZan5NuwuhDW6Mvw"
+
+	kp, err := NewKeyPairFromBase58Seed(seed)
+	assert.NoError(t, err)
+	assert.Equal(t, "livenet", kp.Network())
+}
+
 func TestKIFEncodeDecode(t *testing.T) {
 	p1, err := NewKeyPair(true, ED25519)
 	assert.NoError(t, err)
