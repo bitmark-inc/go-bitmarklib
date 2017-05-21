@@ -41,13 +41,13 @@ var (
 
 type KeyPair struct {
 	*account.PrivateKey
-	seed string
+	seed []byte
 }
 
 // Return a KIF string for a keypair
 func (kp KeyPair) KIF() (string, error) {
 
-	if kp.seed == "" {
+	if kp.seed == nil {
 		return "", ErrInvalidSeed
 	}
 
@@ -59,9 +59,7 @@ func (kp KeyPair) KIF() (string, error) {
 		variant |= variantTestnet << 1
 	}
 
-	seedBytes := util.FromBase58(kp.seed)
-
-	b := append(util.ToVarint64(variant), seedBytes...)
+	b := append(util.ToVarint64(variant), kp.seed...)
 	checksum := sha3.Sum256(b)
 	kifBytes := append(b, checksum[:4]...)
 
@@ -69,11 +67,11 @@ func (kp KeyPair) KIF() (string, error) {
 }
 
 func (kp KeyPair) Seed() string {
-	return kp.seed
+	return util.ToBase58(kp.seed)
 }
 
 func (kp KeyPair) SeedBytes() []byte {
-	return util.FromBase58(kp.seed)
+	return kp.seed
 }
 
 // NewKeyPair will first generate a seed. Then it use the seed
@@ -98,7 +96,7 @@ func NewKeyPairFromBase58Seed(seed string) (*KeyPair, error) {
 
 	return &KeyPair{
 		PrivateKey: p,
-		seed:       seed,
+		seed:       util.FromBase58(seed),
 	}, nil
 }
 
@@ -150,15 +148,14 @@ func NewKeyPairFromKIF(kif string) (*KeyPair, error) {
 	if !bytes.Equal(checksum[:kifChecksumLength], kifChecksum) {
 		return nil, ErrChecksumMismatch
 	}
-	seed := util.ToBase58(seedBytes)
 
-	p, err := account.PrivateKeyFromBase58Seed(seed)
+	p, err := account.PrivateKeyFromBase58Seed(util.ToBase58(seedBytes))
 	if err != nil {
 		return nil, err
 	}
 
 	return &KeyPair{
 		PrivateKey: p,
-		seed:       seed,
+		seed:       seedBytes,
 	}, nil
 }
