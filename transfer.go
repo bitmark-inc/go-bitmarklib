@@ -13,6 +13,7 @@ type Transfer struct {
 	*transactionrecord.BitmarkTransfer
 }
 
+// NewTransfer will return a Transfer struct
 func NewTransfer(txId, newOwner string) (*Transfer, error) {
 	link := merkle.Digest{}
 	link.UnmarshalText([]byte(txId))
@@ -39,6 +40,8 @@ func NewTransfer(txId, newOwner string) (*Transfer, error) {
 	return t, nil
 }
 
+// Sign will sign a transfer with an owner private key. This action
+// won't check whether a transfer belongs to an owner.
 func (t *Transfer) Sign(privateKey *account.PrivateKey) error {
 	packed, _ := t.Pack(t.Owner)
 	if nil == packed {

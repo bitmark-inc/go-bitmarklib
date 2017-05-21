@@ -74,11 +74,13 @@ func (kp KeyPair) SeedBytes() []byte {
 	return kp.seed
 }
 
+// Return the algorithm type of a keypair
 func (kp KeyPair) KeyType() string {
 	// HARDCODE: only one algorithm type is in the system now.
 	return "ed25519"
 }
 
+// Return the network of a keypair
 func (kp KeyPair) Network() string {
 	// FIXME: it is better to use variables in bitmarkd for determine header size.
 	if len(kp.seed) < 4 {
