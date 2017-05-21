@@ -1,7 +1,9 @@
 package bitmarklib
 
 import (
+	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"github.com/bitmark-inc/bitmarkd/account"
 	"github.com/bitmark-inc/bitmarkd/merkle"
@@ -58,4 +60,15 @@ func (t *Transfer) Sign(privateKey *account.PrivateKey) error {
 	t.Signature = ed25519.Sign(privateKey.PrivateKeyBytes(), packed)
 	_, err := t.Pack(ownerAccount)
 	return err
+}
+
+// Return the base64 string of the JSON object. Return empty if there is
+// something wrong.
+func (t Transfer) String() string {
+	b, err := json.Marshal(t)
+	if err != nil {
+		return ""
+	}
+	payload := base64.StdEncoding.EncodeToString(b)
+	return payload
 }
