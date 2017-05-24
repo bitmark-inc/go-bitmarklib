@@ -18,6 +18,7 @@ var (
 	ErrEmptyMetadata     = fmt.Errorf("metadata can not be empty")
 )
 
+// Asset includes name, meta and fingerprint of the actual digital property
 type Asset struct {
 	transactionrecord.AssetData
 }
@@ -67,6 +68,7 @@ func (a *Asset) Sign(kp *KeyPair) error {
 	return err
 }
 
+// Issue is to claim the ownership to a specific asset.
 type Issue struct {
 	transactionrecord.BitmarkIssue
 }

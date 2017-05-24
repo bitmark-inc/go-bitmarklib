@@ -24,6 +24,7 @@ const (
 	kifChecksumLength = 4
 )
 
+// The algorithm type of a keypair
 type KeyType int
 
 const (
@@ -39,12 +40,14 @@ var (
 	ErrChecksumMismatch = fmt.Errorf("checksum mismatch")
 )
 
+// Keypair is the most important part of bitmark. Every action requires
+// a signature which is signed from a keypair.
 type KeyPair struct {
 	*account.PrivateKey
 	seed []byte
 }
 
-// Return a KIF string for a keypair
+// KIF returns a KIF string for a keypair
 func (kp KeyPair) KIF() (string, error) {
 
 	if kp.seed == nil {
@@ -66,15 +69,17 @@ func (kp KeyPair) KIF() (string, error) {
 	return util.ToBase58(kifBytes), nil
 }
 
+// Seed returns the base58 string of a seed of a keypair
 func (kp KeyPair) Seed() string {
 	return util.ToBase58(kp.seed)
 }
 
+// SeedBytes returns bytes of a seed of a keypair
 func (kp KeyPair) SeedBytes() []byte {
 	return kp.seed
 }
 
-// Return the algorithm type of a keypair
+// KeyType returns the algorithm type of a keypair
 func (kp KeyPair) KeyType() string {
 	// HARDCODE: only one algorithm type is in the system now.
 	return "ed25519"

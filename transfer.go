@@ -11,6 +11,7 @@ import (
 	"golang.org/x/crypto/ed25519"
 )
 
+// Transfer is made for issue transfering
 type Transfer struct {
 	*transactionrecord.BitmarkTransfer
 }
