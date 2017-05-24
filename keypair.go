@@ -79,6 +79,11 @@ func (kp KeyPair) SeedBytes() []byte {
 	return kp.seed
 }
 
+// String returns the base58 string of the private key in a keypair
+func (kp KeyPair) String() string {
+	return util.ToBase58(kp.PrivateKey.PrivateKeyBytes())
+}
+
 // KeyType returns the algorithm type of a keypair
 func (kp KeyPair) KeyType() string {
 	// HARDCODE: only one algorithm type is in the system now.

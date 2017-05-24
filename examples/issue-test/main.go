@@ -124,8 +124,10 @@ func main() {
 	issues := make([]*transactionrecord.BitmarkIssue, quantity)
 	for i := 0; i < quantity; i++ {
 		issue := bitmarklib.NewIssue(asset.AssetIndex())
-		issue.Sign(keypair)
-		issues[i] = &issue.BitmarkIssue
+		err := issue.Sign(keypair)
+		if err != nil {
+			issues[i] = &issue.BitmarkIssue
+		}
 	}
 
 	r := rpc.CreateArguments{
