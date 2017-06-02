@@ -45,20 +45,14 @@ func NewTransfer(txId, newOwner string) (*Transfer, error) {
 
 // Sign will sign a transfer with an owner private key. This action
 // won't check whether a transfer belongs to an owner.
-func (t *Transfer) Sign(privateKey *account.PrivateKey) error {
+func (t *Transfer) Sign(kp *KeyPair) error {
 	packed, _ := t.Pack(t.Owner)
 	if nil == packed {
 		return fmt.Errorf("fail to pack transfer")
 	}
 
-	ownerAccount := &account.Account{
-		AccountInterface: &account.ED25519Account{
-			Test:      true,
-			PublicKey: privateKey.Account().PublicKeyBytes(),
-		},
-	}
-
-	t.Signature = ed25519.Sign(privateKey.PrivateKeyBytes(), packed)
+	ownerAccount := kp.Account()
+	t.Signature = ed25519.Sign(kp.PrivateKeyBytes(), packed)
 	_, err := t.Pack(ownerAccount)
 	return err
 }

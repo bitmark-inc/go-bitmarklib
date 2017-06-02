@@ -17,7 +17,7 @@ func Example_createTransfer() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = transfer.Sign(kp.PrivateKey)
+	err = transfer.Sign(kp)
 	if err != nil {
 		log.Fatal(err)
 	}

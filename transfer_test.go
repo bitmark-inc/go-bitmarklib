@@ -17,7 +17,7 @@ func TestTransferSign(t *testing.T) {
 	assert.NoError(t, err)
 
 	transfer, err := NewTransfer("6776599a5fd4f2ade1ca87ee5fffd0295bb69b1969ffab1ec042a5f71ef74209", "fa447039da1cb03c0e48ab48dec69769d3affce01a5565a4b64a5d920f3c21a9")
-	err = transfer.Sign(owner.PrivateKey)
+	err = transfer.Sign(owner)
 	assert.NoError(t, err)
 	assert.NotNil(t, transfer.Signature)
 }

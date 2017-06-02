@@ -101,7 +101,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = transfer.Sign(keypair.PrivateKey)
+	err = transfer.Sign(keypair)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -113,7 +113,7 @@ func main() {
 		Payload: transfer.String(),
 	}
 
-	a.Sign(keypair.PrivateKey.PrivateKeyBytes())
+	a.Sign(keypair.PrivateKeyBytes())
 
 	err = requestTransfer(client, a)
 	if err != nil {
