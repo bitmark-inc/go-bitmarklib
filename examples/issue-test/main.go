@@ -126,8 +126,9 @@ func main() {
 		issue := bitmarklib.NewIssue(asset.AssetIndex())
 		err := issue.Sign(keypair)
 		if err != nil {
-			issues[i] = &issue.BitmarkIssue
+			continue
 		}
+		issues[i] = &issue.BitmarkIssue
 	}
 
 	r := rpc.CreateArguments{
