@@ -73,8 +73,11 @@ func requestTransfer(client *http.Client, a action.Action) error {
 }
 
 func main() {
-	privKey := "3dhdr73LyfYvjeJsayV2A4TVkSrC7MS99CUwmz6fwHG62dVDLUh1jdy7mAntwoGP2xYtxvdxQzTgzq7KbDLCi4ub"
-	keypair := bitmarklib.NewKeyPairFromBase58PrivateKey(privKey, bitmarklib.ED25519)
+	seed := "GUgLnRy3Fns6Twns2THBsZjdRWGsaDXENq18mZzHuTPy"
+	keypair, err := bitmarklib.NewKeyPairFromBase58Seed(seed, true, bitmarklib.ED25519)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	txId := flag.String("txId", "", "transaction id")
 	flag.Parse()

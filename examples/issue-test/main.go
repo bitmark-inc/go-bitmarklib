@@ -89,8 +89,8 @@ func requestAction(client *http.Client, a action.Action) error {
 }
 
 func main() {
-	seed := "5XEECtyEvdwvvgYo6TGkyQ59BG1zYZRkuLh6hhtebyaeKgMYxkn7DEt"
-	keypair, err := bitmarklib.NewKeyPairFromBase58Seed(seed)
+	seed := "GUgLnRy3Fns6Twns2THBsZjdRWGsaDXENq18mZzHuTPy"
+	keypair, err := bitmarklib.NewKeyPairFromBase58Seed(seed, true, bitmarklib.ED25519)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,10 +2,11 @@ package bitmarklib
 
 import (
 	"bytes"
+	"crypto/rand"
 	"fmt"
 	"github.com/bitmark-inc/bitmarkd/account"
-	"github.com/bitmark-inc/bitmarkd/keypair"
 	"github.com/bitmark-inc/bitmarkd/util"
+	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -20,7 +21,7 @@ const (
 )
 
 const (
-	seedLength        = 40
+	seedLength        = 32
 	kifChecksumLength = 4
 )
 
@@ -90,48 +91,45 @@ func (kp KeyPair) KeyType() string {
 	return "ed25519"
 }
 
-// Return the network of a keypair
-func (kp KeyPair) Network() string {
-	// FIXME: it is better to use variables in bitmarkd for determine header size.
-	if len(kp.seed) < 4 {
-		return "unknown"
-	}
-
-	networkByte := kp.seed[3]
-	switch networkByte {
-	case variantLivenet:
-		return "livenet"
-	case variantTestnet:
-		return "testnet"
-	default:
-		return "unknown"
-	}
-}
-
 // NewKeyPair will first generate a seed. Then it use the seed
 // to generate a new keypair
 func NewKeyPair(test bool, algorithm KeyType) (*KeyPair, error) {
-	seed, err := keypair.NewSeed(test)
-	if err != nil {
+	seedCore := make([]byte, seedLength)
+	n, err := rand.Read(seedCore)
+	if nil != err {
+		return nil, err
+	}
+	if 32 != n {
+		panic("too few random bytes")
+	}
+
+	return NewKeyPairFromSeed(seedCore, test, algorithm)
+}
+
+// Generate a new keypair with specific seed byte.
+func NewKeyPairFromSeed(seed []byte, test bool, algorithm KeyType) (*KeyPair, error) {
+	_, priv, err := ed25519.GenerateKey(bytes.NewBuffer(seed))
+	if nil != err {
 		return nil, err
 	}
 
-	return NewKeyPairFromBase58Seed(seed)
-}
-
-// Generate a new keypair with specific seed string.
-// The the network info and the algorithm will be
-// extracted from in the seed.
-func NewKeyPairFromBase58Seed(seed string) (*KeyPair, error) {
-	p, err := account.PrivateKeyFromBase58Seed(seed)
-	if err != nil {
-		return nil, err
+	privateKey := &account.PrivateKey{
+		PrivateKeyInterface: &account.ED25519PrivateKey{
+			Test:       test,
+			PrivateKey: priv,
+		},
 	}
 
 	return &KeyPair{
-		PrivateKey: p,
-		seed:       util.FromBase58(seed),
+		PrivateKey: privateKey,
+		seed:       seed,
 	}, nil
+}
+
+// Generate a new keypair with specific seed string.
+func NewKeyPairFromBase58Seed(seed string, test bool, algorithm KeyType) (*KeyPair, error) {
+	seedCore := util.FromBase58(seed)
+	return NewKeyPairFromSeed(seedCore, test, algorithm)
 }
 
 // Generate keypair from base58 private key. The keypair may be lack of
@@ -159,20 +157,12 @@ func NewKeyPairFromBase58PrivateKey(key string, algorithm KeyType) *KeyPair {
 func NewKeyPairFromKIF(kif string) (*KeyPair, error) {
 	b := util.FromBase58(kif)
 	v, n := util.FromVarint64(b)
-
 	if n+seedLength+kifChecksumLength != len(b) {
 		return nil, ErrKIFLength
 	}
 
 	if v&0x01 != variantPrivateKey {
 		return nil, ErrInvalidKeyType
-	}
-
-	v = v >> 4
-	switch v & 0x01 {
-	case variantKeyTypeED25519:
-	default:
-		return nil, ErrInvalidAlgorithm
 	}
 
 	seedBytes := b[n : n+seedLength]
@@ -183,13 +173,13 @@ func NewKeyPairFromKIF(kif string) (*KeyPair, error) {
 		return nil, ErrChecksumMismatch
 	}
 
-	p, err := account.PrivateKeyFromBase58Seed(util.ToBase58(seedBytes))
-	if err != nil {
-		return nil, err
-	}
+	test := v&0x02 != 0
 
-	return &KeyPair{
-		PrivateKey: p,
-		seed:       seedBytes,
-	}, nil
+	v = v >> 4
+	switch v & 0x01 {
+	case variantKeyTypeED25519:
+		return NewKeyPairFromSeed(seedBytes, test, ED25519)
+	default:
+		return nil, ErrInvalidAlgorithm
+	}
 }

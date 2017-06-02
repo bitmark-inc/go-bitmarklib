@@ -7,8 +7,8 @@ import (
 )
 
 func Example_createTransfer() {
-	seed := "5XEECseCzmTE1SeJb5tQCpDK6cyDx2qKinCg5BNFgWnn3d9FjsEVDHZ"
-	kp, err := bitmarklib.NewKeyPairFromBase58Seed(seed)
+	seed := "8VNLU6LSMjnCfMNHG9YftLV1TVWzAphfCSwJsf351974"
+	kp, err := bitmarklib.NewKeyPairFromBase58Seed(seed, true, bitmarklib.ED25519)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,5 +23,5 @@ func Example_createTransfer() {
 	}
 
 	fmt.Println(transfer)
-	// Output: eyJsaW5rIjoiNjc3NjU5OWE1ZmQ0ZjJhZGUxY2E4N2VlNWZmZmQwMjk1YmI2OWIxOTY5ZmZhYjFlYzA0MmE1ZjcxZWY3NDIwOSIsInBheW1lbnQiOm51bGwsIm93bmVyIjoiZnFONldualVhZWtmcnFCdnZtc2pWc2tvcVhuaEo2MzJ4SlBIemRTZ1JlQzZiaFpHdVAiLCJzaWduYXR1cmUiOiJkNjQxMzlhOTcxMjE3ZDJkNjE3ZDdmYmUwMDYwZWYwNDk4ZjA2OGY3N2IyYzIxNzNmYjhmYzEwN2NlYzRiNWQ4ZjNkNzM0OTJjZmZlNzY4MDM1M2YyMTljN2ZjYmY1ZTJjYzllNDc3NWNiMWJkODg5NGE4ODFjOTlmNGVjMzUwMiJ9
+	// Output: eyJsaW5rIjoiNjc3NjU5OWE1ZmQ0ZjJhZGUxY2E4N2VlNWZmZmQwMjk1YmI2OWIxOTY5ZmZhYjFlYzA0MmE1ZjcxZWY3NDIwOSIsInBheW1lbnQiOm51bGwsIm93bmVyIjoiZnFONldualVhZWtmcnFCdnZtc2pWc2tvcVhuaEo2MzJ4SlBIemRTZ1JlQzZiaFpHdVAiLCJzaWduYXR1cmUiOiJlMTQ2NDJjOWI5ZjBlMTQwOWFkMmEwYjlhMjQ4YmYzNTZlZTlhOTg1NGE0YzRmNjAyZDNkZThkYWNjZjVjZDExZWUyNzBjOTQ1YzdkM2JiNThhM2ZjMjg1OGMxMDliZGI5YWQzMTkxNGQyZTFhMTg2NzM4M2ZkY2QxZjMwMGYwZSJ9
 }

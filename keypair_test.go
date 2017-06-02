@@ -10,48 +10,31 @@ import (
 func TestNewKeypair(t *testing.T) {
 	p, err := NewKeyPair(true, ED25519)
 	assert.NoError(t, err)
-	assert.Len(t, p.seed, 40)
+	assert.Len(t, p.seed, 32)
 	assert.Len(t, p.PrivateKeyBytes(), 64)
 	assert.True(t, bytes.Equal(p.PrivateKeyBytes()[32:], p.Account().PublicKeyBytes()))
 }
 
 func TestFromKIF(t *testing.T) {
-	kif := "TLpSduNW7r3zrkc9foneYs2zTkikVPnY1SNZaYbispusdFmittczPGKDLKtzH"
+	kif := "cYK2SzQnYLG55yiRCSryymEw3EaNYnCD2mtCwkVXdFLSzQ4ReV"
 	kp, err := NewKeyPairFromKIF(kif)
 	assert.NoError(t, err)
 	assert.True(t, kp.PrivateKey.IsTesting())
 	privateKey := util.ToBase58(kp.PrivateKey.PrivateKeyBytes())
-	assert.Equal(t, privateKey,
-		"5xJrqMvvHixJ8SVJyXgQDPiW46Ghbxkk6EkqGRqRnj7FUh5bsKPi2vejjGkTaM5ed24Q14bW4sx2ce38HVD16Jx8",
+	assert.Equal(t,
+		"2T2LWi7M7Qz9vx3vaMiNCwzreSGEkBMkDcbMhq2Ss5LZTtWWAXUxVjk7N5Gg1guTW1XMHu4wrTXBik8EmVkPvZcK",
+		privateKey,
 	)
 }
 
 func TestNewKeypairFromBase58Seed(t *testing.T) {
-	seed := "5XEECseCzmTE1SeJb5tQCpDK6cyDx2qKinCg5BNFgWnn3d9FjsEVDHZ"
+	seed := "8VNLU6LSMjnCfMNHG9YftLV1TVWzAphfCSwJsf351974"
 
-	kp, err := NewKeyPairFromBase58Seed(seed)
+	kp, err := NewKeyPairFromBase58Seed(seed, true, ED25519)
 	assert.NoError(t, err)
 	assert.True(t, kp.PrivateKey.IsTesting())
 	privateKey := util.ToBase58(kp.PrivateKey.PrivateKeyBytes())
-	assert.Equal(t, privateKey,
-		"3x5n7S3MBG2jFWvuxxXMNAVavxKipXrH6vBtnoCDqPAMtZwzYCLPKq4NY7zoZ6HQ5CRQMNV2i3srL81XuskLy3xt",
-	)
-}
-
-func TestNetworkTypeTestnet(t *testing.T) {
-	seed := "5XEECseCzmTE1SeJb5tQCpDK6cyDx2qKinCg5BNFgWnn3d9FjsEVDHZ"
-
-	kp, err := NewKeyPairFromBase58Seed(seed)
-	assert.NoError(t, err)
-	assert.Equal(t, "testnet", kp.Network())
-}
-
-func TestNetworkTypeLivenet(t *testing.T) {
-	seed := "5XEECqgoxCaQyGgJBMtW2WP57bnu4eVUUveNN56RZan5NuwuhDW6Mvw"
-
-	kp, err := NewKeyPairFromBase58Seed(seed)
-	assert.NoError(t, err)
-	assert.Equal(t, "livenet", kp.Network())
+	assert.Equal(t, "3E2z4v1HjJUtxzh8CQeDN3NJ1THPs2bcuPiqJrEFNZLhw58gcWBuM1ZouCwwZZxBmZztkdEaRJrmLLoBpyb7dEoz", privateKey)
 }
 
 func TestKIFEncodeDecode(t *testing.T) {
