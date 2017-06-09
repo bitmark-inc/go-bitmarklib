@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -66,7 +67,15 @@ func requestTransfer(client *http.Client, a action.Action) error {
 		log.Fatalf("request action error: %s", err)
 	}
 	defer r.Body.Close()
-	if r.StatusCode != http.StatusNoContent {
+
+	resultBuf := &bytes.Buffer{}
+	_, err = io.Copy(resultBuf, r.Body)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(resultBuf.String())
+	if r.StatusCode != http.StatusOK {
 		return fmt.Errorf(r.Status)
 	}
 	return nil

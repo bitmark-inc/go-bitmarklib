@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"encoding/base64"
-	"github.com/bitmark-inc/bitmarkd/rpc"
-	"github.com/bitmark-inc/bitmarkd/transactionrecord"
 	"github.com/bitmark-inc/go-bitmarklib"
 	"github.com/bitmark-inc/go-programs/bitmarkd-gateway/action"
 )
@@ -88,6 +86,11 @@ func requestAction(client *http.Client, a action.Action) error {
 	return nil
 }
 
+type IssueCreateArgument struct {
+	Assets []bitmarklib.Asset
+	Issues []bitmarklib.Issue
+}
+
 func main() {
 	seed := "GUgLnRy3Fns6Twns2THBsZjdRWGsaDXENq18mZzHuTPy"
 	keypair, err := bitmarklib.NewKeyPairFromBase58Seed(seed, true, bitmarklib.ED25519)
@@ -121,18 +124,19 @@ func main() {
 	}
 
 	quantity := 1
-	issues := make([]*transactionrecord.BitmarkIssue, quantity)
+	issues := make([]bitmarklib.Issue, quantity)
+
 	for i := 0; i < quantity; i++ {
 		issue := bitmarklib.NewIssue(asset.AssetIndex())
 		err := issue.Sign(keypair)
 		if err != nil {
 			continue
 		}
-		issues[i] = &issue.BitmarkIssue
+		issues[i] = issue
 	}
 
-	r := rpc.CreateArguments{
-		Assets: []*transactionrecord.AssetData{&asset.AssetData},
+	r := IssueCreateArgument{
+		Assets: []bitmarklib.Asset{asset},
 		Issues: issues,
 	}
 
