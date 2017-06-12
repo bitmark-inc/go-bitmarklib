@@ -15,7 +15,6 @@ var nonceIndex uint64
 
 var (
 	ErrEmptyMetaKeyValue = fmt.Errorf("key and value of metadata can not be empty")
-	ErrEmptyMetadata     = fmt.Errorf("metadata can not be empty")
 )
 
 // Asset includes name, meta and fingerprint of the actual digital property
@@ -52,10 +51,6 @@ func (a *Asset) SetMeta(metadata map[string]string) error {
 // Sign an asset with a keypair and write the signature into
 // Signature field
 func (a *Asset) Sign(kp *KeyPair) error {
-	if a.Metadata == "" {
-		return ErrEmptyMetadata
-	}
-
 	a.Registrant = kp.Account()
 
 	packed, _ := a.Pack(a.Registrant)
