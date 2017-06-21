@@ -17,7 +17,7 @@ type Transfer struct {
 }
 
 // NewTransfer will return a Transfer struct
-func NewTransfer(txId, newOwner string) (*Transfer, error) {
+func NewTransfer(txId, newOwner string, test bool) (*Transfer, error) {
 	link := merkle.Digest{}
 	link.UnmarshalText([]byte(txId))
 
@@ -27,7 +27,7 @@ func NewTransfer(txId, newOwner string) (*Transfer, error) {
 	}
 	newOwnerAccount := &account.Account{
 		AccountInterface: &account.ED25519Account{
-			Test:      true,
+			Test:      test,
 			PublicKey: newOwnerBytes,
 		},
 	}
