@@ -1,6 +1,7 @@
 package bitmarklib_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/bitmark-inc/go-bitmarklib"
 	"log"
@@ -13,7 +14,7 @@ func Example_createTransfer() {
 		log.Fatal(err)
 	}
 
-	transfer, err := bitmarklib.NewTransfer("6776599a5fd4f2ade1ca87ee5fffd0295bb69b1969ffab1ec042a5f71ef74209", "fa447039da1cb03c0e48ab48dec69769d3affce01a5565a4b64a5d920f3c21a9")
+	transfer, err := bitmarklib.NewTransfer("6776599a5fd4f2ade1ca87ee5fffd0295bb69b1969ffab1ec042a5f71ef74209", "fqN6WnjUaekfrqBvvmsjVskoqXnhJ632xJPHzdSgReC6bhZGuP", true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,6 +23,10 @@ func Example_createTransfer() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(transfer)
-	// Output: eyJsaW5rIjoiNjc3NjU5OWE1ZmQ0ZjJhZGUxY2E4N2VlNWZmZmQwMjk1YmI2OWIxOTY5ZmZhYjFlYzA0MmE1ZjcxZWY3NDIwOSIsInBheW1lbnQiOm51bGwsIm93bmVyIjoiZnFONldualVhZWtmcnFCdnZtc2pWc2tvcVhuaEo2MzJ4SlBIemRTZ1JlQzZiaFpHdVAiLCJzaWduYXR1cmUiOiJlMTQ2NDJjOWI5ZjBlMTQwOWFkMmEwYjlhMjQ4YmYzNTZlZTlhOTg1NGE0YzRmNjAyZDNkZThkYWNjZjVjZDExZWUyNzBjOTQ1YzdkM2JiNThhM2ZjMjg1OGMxMDliZGI5YWQzMTkxNGQyZTFhMTg2NzM4M2ZkY2QxZjMwMGYwZSJ9
+	b, err := json.Marshal(transfer)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(b))
+	// Output: {"link":"6776599a5fd4f2ade1ca87ee5fffd0295bb69b1969ffab1ec042a5f71ef74209","payment":null,"owner":"fqN6WnjUaekfrqBvvmsjVskoqXnhJ632xJPHzdSgReC6bhZGuP","signature":"e14642c9b9f0e1409ad2a0b9a248bf356ee9a9854a4c4f602d3de8daccf5cd11ee270c945c7d3bb58a3fc2858c109bdb9ad31914d2e1a1867383fdcd1f300f0e"}
 }
