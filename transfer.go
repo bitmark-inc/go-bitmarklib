@@ -2,7 +2,6 @@ package bitmarklib
 
 import (
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/bitmark-inc/bitmarkd/account"
@@ -21,15 +20,9 @@ func NewTransfer(txId, newOwner string, test bool) (*Transfer, error) {
 	link := merkle.Digest{}
 	link.UnmarshalText([]byte(txId))
 
-	newOwnerBytes, err := hex.DecodeString(newOwner)
+	newOwnerAccount, err := account.AccountFromBase58(newOwner)
 	if err != nil {
 		return nil, err
-	}
-	newOwnerAccount := &account.Account{
-		AccountInterface: &account.ED25519Account{
-			Test:      test,
-			PublicKey: newOwnerBytes,
-		},
 	}
 
 	t := &Transfer{

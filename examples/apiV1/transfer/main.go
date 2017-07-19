@@ -70,8 +70,10 @@ func main() {
 	}
 	client := &http.Client{Transport: tr}
 
-	newOwnerKey := "fa447039da1cb03c0e48ab48dec69769d3affce01a5565a4b64a5d920f3c21a9"
-	transfer, err := bitmarklib.NewTransfer(*txId, newOwnerKey, true)
+	// publicKey := "fa447039da1cb03c0e48ab48dec69769d3affce01a5565a4b64a5d920f3c21a9"
+	address := "fqN6WnjUaekfrqBvvmsjVskoqXnhJ632xJPHzdSgReC6bhZGuP"
+
+	transfer, err := bitmarklib.NewTransfer(*txId, address, true)
 	if err != nil {
 		log.Fatal(err)
 	}
