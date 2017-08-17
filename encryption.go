@@ -3,8 +3,6 @@ package bitmarklib
 import (
 	"bufio"
 	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
 	"crypto/rand"
 	"encoding/binary"
 	"encoding/hex"
@@ -63,19 +61,14 @@ func (k *ChaCha20SessionKey) String() string {
 }
 
 func (k *ChaCha20SessionKey) Encrypt(plaintext []byte) ([]byte, error) {
-	block, err := aes.NewCipher(k.key)
-	if err != nil {
-		return nil, err
-	}
-
-	aesgcm, err := cipher.NewGCM(block)
+	aead, err := chacha20poly1305.New(k.key)
 	if err != nil {
 		return nil, err
 	}
 
 	nonce := make([]byte, chacha20poly1305.NonceSize)
 
-	ciphertext := aesgcm.Seal(nil, nonce, plaintext, nil)
+	ciphertext := aead.Seal(nil, nonce, plaintext, nil)
 
 	count := make([]byte, ciphertextCountSize)
 	binary.LittleEndian.PutUint64(count, uint64(len(ciphertext)))
@@ -106,17 +99,12 @@ func (k *ChaCha20SessionKey) Decrypt(encryptedContent []byte) ([]byte, error) {
 		return nil, errors.New("invalid ciphertext")
 	}
 
-	block, err := aes.NewCipher(k.key)
+	aead, err := chacha20poly1305.New(k.key)
 	if err != nil {
 		return nil, err
 	}
 
-	aesgcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return nil, err
-	}
-
-	plaintext, err := aesgcm.Open(nil, nonce, ciphertext, nil)
+	plaintext, err := aead.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return nil, err
 	}
