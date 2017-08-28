@@ -25,6 +25,7 @@ const (
 const (
 	seedLength        = 32
 	kifChecksumLength = 4
+	checksumLength    = 4
 )
 
 // The algorithm type of a keypair
@@ -42,6 +43,10 @@ var (
 	ErrInvalidAlgorithm = fmt.Errorf("invalid key algorithm")
 	ErrChecksumMismatch = fmt.Errorf("checksum mismatch")
 )
+
+type PublicKey struct {
+	*account.Account
+}
 
 // Keypair is the most important part of bitmark. Every action requires
 // a signature which is signed from a keypair.
@@ -91,6 +96,50 @@ func (kp KeyPair) String() string {
 func (kp KeyPair) KeyType() string {
 	// HARDCODE: only one algorithm type is in the system now.
 	return "ed25519"
+}
+
+// NewPublicKey generate a PublicKey struct from a key byte
+func NewPublicKey(keyByte []byte) (*PublicKey, error) {
+	checksumStart := len(keyByte) - checksumLength
+	keyLeft := keyByte[:checksumStart]
+
+	// verify the checksum of public key
+	checksum := sha3.Sum256(keyLeft)
+	if !bytes.Equal(checksum[:checksumLength], keyByte[checksumStart:]) {
+		return nil, ErrChecksumMismatch
+	}
+
+	variant := keyLeft[0]
+	key := keyLeft[1:]
+
+	if variant&0x01 != variantPublicKey {
+		return nil, ErrInvalidKeyType
+	}
+	test := variant&0x02 != 0
+
+	var ai account.AccountInterface
+	variant = variant >> 4
+	switch variant & 0x01 {
+	case variantKeyTypeED25519:
+		ai = &account.ED25519Account{
+			PublicKey: key,
+			Test:      test,
+		}
+	default:
+		return nil, ErrInvalidAlgorithm
+	}
+
+	return &PublicKey{
+		&account.Account{
+			AccountInterface: ai,
+		},
+	}, nil
+}
+
+// NewPubKeyFromAccount will generate a PublicKey struct from an account string
+func NewPubKeyFromAccount(account string) (*PublicKey, error) {
+	accountBytes := util.FromBase58(account)
+	return NewPublicKey(accountBytes)
 }
 
 // NewKeyPair will first generate a seed. Then it use the seed
