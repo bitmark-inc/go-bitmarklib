@@ -13,31 +13,31 @@ var (
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	}
-	accountSeedCountBM = [16]byte{
+	authSeedCountBM = [16]byte{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xe7,
 	}
-	accessSeedCountBM = [16]byte{
+	encrSeedCountBM = [16]byte{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xe8,
 	}
 )
 
-type AccessKeyPair struct {
+type EncrKeyPair struct {
 	PrivateKey *[32]byte
 	PublicKey  *[32]byte
 }
 
-func NewAccessKeyPairFromSeed(seed []byte) (*AccessKeyPair, error) {
+func NewEncrKeyPairFromSeed(seed []byte) (*EncrKeyPair, error) {
 	var secretKey [32]byte
 	copy(secretKey[:], seed)
 
-	encryptedAccessSeed := secretbox.Seal([]byte{}, accessSeedCountBM[:], &seedNonce, &secretKey)
+	encryptedEncrSeed := secretbox.Seal([]byte{}, encrSeedCountBM[:], &seedNonce, &secretKey)
 
-	pub, pri, err := box.GenerateKey(bytes.NewBuffer(encryptedAccessSeed))
+	pub, pvt, err := box.GenerateKey(bytes.NewBuffer(encryptedEncrSeed))
 	if err != nil {
 		return nil, err
 	}
 
-	return &AccessKeyPair{PrivateKey: pri, PublicKey: pub}, nil
+	return &EncrKeyPair{PrivateKey: pvt, PublicKey: pub}, nil
 }

@@ -191,9 +191,9 @@ func NewKeyPairFromCoreSeed(seed []byte, test bool, algorithm KeyType) (*KeyPair
 	var secretKey [32]byte
 	copy(secretKey[:], seed)
 
-	encryptedAccessSeed := secretbox.Seal([]byte{}, accountSeedCountBM[:], &seedNonce, &secretKey)
+	encryptedAuthSeed := secretbox.Seal([]byte{}, authSeedCountBM[:], &seedNonce, &secretKey)
 
-	_, priv, err := ed25519.GenerateKey(bytes.NewBuffer(encryptedAccessSeed))
+	_, priv, err := ed25519.GenerateKey(bytes.NewBuffer(encryptedAuthSeed))
 	if nil != err {
 		return nil, err
 	}
