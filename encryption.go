@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"io"
 
@@ -20,6 +21,35 @@ type SessionData struct {
 	EncryptedSessionKey          []byte
 	EncryptedSessionKeySignature []byte
 	SessionKeySignature          []byte
+}
+
+func (d *SessionData) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		EncryptedSessionKey          string `json:"enc_skey"`
+		EncryptedSessionKeySignature string `json:"enc_skey_sig"`
+		SessionKeySignature          string `json:"skey_sig"`
+	}{
+		EncryptedSessionKey:          hex.EncodeToString(d.EncryptedSessionKey),
+		EncryptedSessionKeySignature: hex.EncodeToString(d.EncryptedSessionKeySignature),
+		SessionKeySignature:          hex.EncodeToString(d.SessionKeySignature),
+	})
+}
+
+func (d *SessionData) UnmarshalJSON(data []byte) error {
+	var aux struct {
+		EncryptedSessKey          string `json:"enc_skey"`
+		EncryptedSessKeySignature string `json:"enc_skey_sig"`
+		SessKeySignature          string `json:"skey_sig"`
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	d.EncryptedSessionKey, _ = hex.DecodeString(aux.EncryptedSessKey)
+	d.EncryptedSessionKeySignature, _ = hex.DecodeString(aux.EncryptedSessKeySignature)
+	d.SessionKeySignature, _ = hex.DecodeString(aux.SessKeySignature)
+	return nil
 }
 
 type SessionKey interface {
