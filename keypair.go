@@ -8,7 +8,7 @@ import (
 	"github.com/bitmark-inc/bitmarkd/account"
 	"github.com/bitmark-inc/bitmarkd/util"
 	"golang.org/x/crypto/ed25519"
-	"golang.org/x/crypto/nacl/secretbox"
+	"golang.org/x/crypto/nacl/box"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -235,27 +235,17 @@ func NewKeyPairFromKIF(kif string) (*KeyPair, error) {
 	}
 }
 
-// Generate a new keypair from a core seed
-func NewKeyPairFromCoreSeed(seed []byte, test bool, algorithm KeyType) (*KeyPair, error) {
-	var secretKey [32]byte
-	copy(secretKey[:], seed)
+type EncrKeyPair struct {
+	PrivateKey *[32]byte
+	PublicKey  *[32]byte
+}
 
-	encryptedAuthSeed := secretbox.Seal([]byte{}, authSeedCountBM[:], &seedNonce, &secretKey)
-
-	_, priv, err := ed25519.GenerateKey(bytes.NewBuffer(encryptedAuthSeed))
-	if nil != err {
+// Generate a new encryption keypair with the given seed.
+func NewEncrKeyPairFromSeed(seed []byte) (*EncrKeyPair, error) {
+	pub, pvt, err := box.GenerateKey(bytes.NewBuffer(seed))
+	if err != nil {
 		return nil, err
 	}
 
-	privateKey := &account.PrivateKey{
-		PrivateKeyInterface: &account.ED25519PrivateKey{
-			Test:       test,
-			PrivateKey: priv,
-		},
-	}
-
-	return &KeyPair{
-		PrivateKey: privateKey,
-		seed:       seed,
-	}, nil
+	return &EncrKeyPair{PrivateKey: pvt, PublicKey: pub}, nil
 }

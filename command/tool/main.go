@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"golang.org/x/crypto/nacl/secretbox"
+
 	bitmarklib "github.com/bitmark-inc/go-bitmarklib"
 )
 
@@ -27,6 +29,22 @@ var (
 	keysig    string
 )
 
+var (
+	seedNonce = [24]byte{
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	}
+	authSeedCountBM = [16]byte{
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xe7,
+	}
+	encrSeedCountBM = [16]byte{
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xe8,
+	}
+)
+
 func mustDecodeHexString(src string) []byte {
 	dst, err := hex.DecodeString(src)
 	if err != nil {
@@ -34,6 +52,22 @@ func mustDecodeHexString(src string) []byte {
 	}
 
 	return dst
+}
+
+// set nonce = 999 for creating an auth seed
+func createAuthSeed(seed []byte) []byte {
+	var secretKey [32]byte
+	copy(secretKey[:], seed)
+
+	return secretbox.Seal([]byte{}, authSeedCountBM[:], &seedNonce, &secretKey)
+}
+
+// set nonce = 1000 for creating an encr seed
+func createEncrSeed(seed []byte) []byte {
+	var secretKey [32]byte
+	copy(secretKey[:], seed)
+
+	return secretbox.Seal([]byte{}, encrSeedCountBM[:], &seedNonce, &secretKey)
 }
 
 func main() {
@@ -57,26 +91,26 @@ func main() {
 	subcmd.Parse(os.Args[2:])
 
 	senderSeed := mustDecodeHexString(sseed)
-	sAuthKeypair, _ := bitmarklib.NewKeyPairFromCoreSeed(senderSeed, true, bitmarklib.ED25519)
-	sEncrKeypair, _ := bitmarklib.NewEncrKeyPairFromSeed(senderSeed)
+	sAuthKeypair, _ := bitmarklib.NewKeyPairFromSeed(createAuthSeed(senderSeed), true, bitmarklib.ED25519)
+	sEncrKeypair, _ := bitmarklib.NewEncrKeyPairFromSeed(createEncrSeed(senderSeed))
 
 	recipientSeed := mustDecodeHexString(rseed)
-	rEncrKeypair, _ := bitmarklib.NewEncrKeyPairFromSeed(recipientSeed)
+	rEncrKeypair, _ := bitmarklib.NewEncrKeyPairFromSeed(createEncrSeed(recipientSeed))
 
 	switch os.Args[1] {
-	case "genkeypair":
-		s := mustDecodeHexString(seed)
-		actKeyPair, _ := bitmarklib.NewKeyPairFromCoreSeed(s, true, bitmarklib.ED25519)
-		acsKeyPair, _ := bitmarklib.NewEncrKeyPairFromSeed(s)
-
-		fmt.Println("\n→ auth keypair")
-		fmt.Printf("\tprivate key: %s\n", hex.EncodeToString(actKeyPair.PrivateKeyBytes()))
-		fmt.Printf("\tpublic key:  %s\n", hex.EncodeToString(actKeyPair.Account().PublicKeyBytes()))
-
-		fmt.Println("\n→ encr keypair")
-		fmt.Printf("\tprivate key: %s\n", hex.EncodeToString(acsKeyPair.PrivateKey[:]))
-		fmt.Printf("\tpublic key:  %s\n", hex.EncodeToString(acsKeyPair.PublicKey[:]))
-		fmt.Println("")
+	// case "genkeypair":
+	// 	s := mustDecodeHexString(seed)
+	// 	actKeyPair, _ := bitmarklib.NewKeyPairFromCoreSeed(s, true, bitmarklib.ED25519)
+	// 	acsKeyPair, _ := bitmarklib.NewEncrKeyPairFromSeed(s)
+	//
+	// 	fmt.Println("\n→ auth keypair")
+	// 	fmt.Printf("\tprivate key: %s\n", hex.EncodeToString(actKeyPair.PrivateKeyBytes()))
+	// 	fmt.Printf("\tpublic key:  %s\n", hex.EncodeToString(actKeyPair.Account().PublicKeyBytes()))
+	//
+	// 	fmt.Println("\n→ encr keypair")
+	// 	fmt.Printf("\tprivate key: %s\n", hex.EncodeToString(acsKeyPair.PrivateKey[:]))
+	// 	fmt.Printf("\tpublic key:  %s\n", hex.EncodeToString(acsKeyPair.PublicKey[:]))
+	// 	fmt.Println("")
 	case "encrypt":
 		sessKey, _ := bitmarklib.SessionKeyFromHex(bitmarklib.Chacha20poly1305, skey)
 		content, _ := bitmarklib.EncryptAssetFile(mustDecodeHexString(msg), sessKey, sAuthKeypair.PrivateKeyBytes())
