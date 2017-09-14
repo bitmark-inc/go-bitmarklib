@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+
 	"github.com/bitmark-inc/bitmarkd/account"
 	"github.com/bitmark-inc/bitmarkd/merkle"
 	"github.com/bitmark-inc/bitmarkd/transactionrecord"
@@ -16,7 +17,7 @@ type Transfer struct {
 }
 
 // NewTransfer will return a Transfer struct
-func NewTransfer(txId, newOwner string, test bool) (*Transfer, error) {
+func NewTransfer(txId, newOwner string) (*Transfer, error) {
 	link := merkle.Digest{}
 	link.UnmarshalText([]byte(txId))
 

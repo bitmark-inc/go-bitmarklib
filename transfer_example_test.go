@@ -3,8 +3,9 @@ package bitmarklib_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bitmark-inc/go-bitmarklib"
 	"log"
+
+	"github.com/bitmark-inc/go-bitmarklib"
 )
 
 func Example_createTransfer() {
@@ -14,7 +15,7 @@ func Example_createTransfer() {
 		log.Fatal(err)
 	}
 
-	transfer, err := bitmarklib.NewTransfer("6776599a5fd4f2ade1ca87ee5fffd0295bb69b1969ffab1ec042a5f71ef74209", "fqN6WnjUaekfrqBvvmsjVskoqXnhJ632xJPHzdSgReC6bhZGuP", true)
+	transfer, err := bitmarklib.NewTransfer("6776599a5fd4f2ade1ca87ee5fffd0295bb69b1969ffab1ec042a5f71ef74209", "fqN6WnjUaekfrqBvvmsjVskoqXnhJ632xJPHzdSgReC6bhZGuP")
 	if err != nil {
 		log.Fatal(err)
 	}
