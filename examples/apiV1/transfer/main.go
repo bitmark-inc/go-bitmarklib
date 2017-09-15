@@ -58,6 +58,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	address := flag.String("to", "fqN6WnjUaekfrqBvvmsjVskoqXnhJ632xJPHzdSgReC6bhZGuP", "to account")
 	txId := flag.String("txId", "", "transaction id")
 	flag.Parse()
 
@@ -73,7 +74,7 @@ func main() {
 	// publicKey := "fa447039da1cb03c0e48ab48dec69769d3affce01a5565a4b64a5d920f3c21a9"
 	address := "fqN6WnjUaekfrqBvvmsjVskoqXnhJ632xJPHzdSgReC6bhZGuP"
 
-	transfer, err := bitmarklib.NewTransfer(*txId, address, true)
+	transfer, err := bitmarklib.NewTransfer(*txId, *address)
 	if err != nil {
 		log.Fatal(err)
 	}
