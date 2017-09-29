@@ -63,6 +63,18 @@ func (a *Asset) Sign(kp *KeyPair) error {
 	return err
 }
 
+func (a *Asset) ClaimedBy(key AuthKey) error {
+	a.Registrant = key.PublicKey()
+
+	packed, err := a.Pack(a.Registrant)
+	if packed == nil {
+		return err
+	}
+
+	a.Signature = key.Sign(packed)
+	return nil
+}
+
 // Issue is to claim the ownership to a specific asset.
 type Issue struct {
 	transactionrecord.BitmarkIssue
@@ -92,4 +104,18 @@ func (i *Issue) Sign(kp *KeyPair) error {
 	i.Signature = ed25519.Sign(kp.PrivateKeyBytes(), packed)
 	_, err := i.Pack(i.Owner)
 	return err
+}
+
+func (i *Issue) ClaimedBy(key AuthKey) error {
+	atomic.AddUint64(&nonceIndex, 1)
+	i.Nonce = uint64(time.Now().UTC().Unix())*1000 + nonceIndex%1000
+	i.Owner = key.PublicKey()
+
+	packed, err := i.Pack(i.Owner)
+	if packed == nil {
+		return err
+	}
+
+	i.Signature = key.Sign(packed)
+	return nil
 }

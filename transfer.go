@@ -51,6 +51,16 @@ func (t *Transfer) Sign(kp *KeyPair) error {
 	return err
 }
 
+func (t *Transfer) ClaimedBy(key AuthKey) error {
+	packed, err := t.Pack(t.Owner)
+	if packed == nil {
+		return err
+	}
+
+	t.Signature = key.Sign(packed)
+	return nil
+}
+
 // Return the base64 string of the JSON object. Return empty if there is
 // something wrong.
 func (t Transfer) String() string {
