@@ -13,7 +13,7 @@ import (
 
 // Transfer is made for issue transfering
 type Transfer struct {
-	*transactionrecord.BitmarkTransfer
+	*transactionrecord.BitmarkTransferUnratified
 }
 
 // NewTransfer will return a Transfer struct
@@ -27,7 +27,7 @@ func NewTransfer(txId, newOwner string) (*Transfer, error) {
 	}
 
 	t := &Transfer{
-		&transactionrecord.BitmarkTransfer{
+		&transactionrecord.BitmarkTransferUnratified{
 			Link:      link,
 			Owner:     newOwnerAccount,
 			Signature: []byte{},

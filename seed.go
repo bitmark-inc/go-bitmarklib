@@ -76,16 +76,6 @@ func NewSeed(version SeedVersion, network Network) (*Seed, error) {
 	return &Seed{version, network, core[:]}, nil
 }
 
-// func (s Seed) MarshalText() ([]byte, error) {
-// 	return []byte(s.String()), nil
-// }
-//
-// func (s *Seed) UnmarshalText(seedBytes []byte) error {
-// 	seed, err := SeedFromBase58(string(seedBytes))
-// 	*s = *seed
-// 	return err
-// }
-
 func SeedFromBase58(seed string) (*Seed, error) {
 	seedBytes := util.FromBase58(seed)
 
