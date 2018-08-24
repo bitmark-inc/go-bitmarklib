@@ -81,10 +81,10 @@ type Issue struct {
 }
 
 // NewIssue will return an Issue struct
-func NewIssue(assetIndex transactionrecord.AssetIndex) Issue {
+func NewIssue(assetId transactionrecord.AssetIdentifier) Issue {
 	return Issue{
 		BitmarkIssue: transactionrecord.BitmarkIssue{
-			AssetIndex: assetIndex,
+			AssetId: assetId,
 		},
 	}
 }
